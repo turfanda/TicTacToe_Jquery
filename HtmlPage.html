@@ -1,0 +1,452 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>Tic Tac Toe</title>
+    <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+    <link rel="stylesheet" href=" https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+
+    <style>
+        .container {
+            margin: 6% 30%;
+            text-align: center;
+        }
+
+        .align {
+            align-items: center;
+            justify-content: center;
+            display: flex;
+        }
+
+        .xoB {
+            width: 75px;
+            height: 75px;
+            margin: 1px;
+            padding: 1px;
+            font: 20px bold;
+            text-align: center;
+        }
+
+        .xoCont {
+            width: 240Px;
+            text-align: center;
+        }
+
+        input {
+            max-width: 72px;
+            text-align: center;
+        }
+
+        .spaceTop {
+            margin-top: 10px;
+        }
+
+        input.text {
+            margin-bottom: 12px;
+            width: 95%;
+            padding: .4em;
+
+        }
+
+        fieldset {
+            padding: 0;
+            border: 0;
+            margin-top: 25px;
+        }
+
+        .ui-dialog-titlebar-close {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <script>
+        var againstComputer = false;
+        var turn = true;
+        var count = 0;
+        var winner;
+        var aWinner;
+        var draw;
+        var X;
+        var O;
+
+        function dia0() {
+            $('#dialog0').dialog({
+                resizable: false,
+                height: "auto",
+                width: 400,
+                modal: true,
+                show: {
+                    effect: "puff",
+                    duration: 200
+                },
+                hide: {
+                    effect: "puff",
+                    duration: 200
+                },
+                buttons: {
+                    "Go On": function () {
+                        $('button').attr('disabled', false).text("_");
+                        count = 0;
+                        turn = true;
+                        if ($('#p1Name').val() == '' || $('#p2Name').val() == '') {
+                            $('.validateTips').text('Please enter Player Names').css('color', 'red');
+                            dia0();
+                            return;
+                        }
+                        X = $('input[name=XO]:checked', '#myForm').val();
+                        O = $('input[name=XO]:not(:checked)', '#myForm').val();
+                        $('#P1').val($('#p1Name').val());
+                        $('#P2').val($('#p2Name').val());
+                        $(this).dialog("close");
+                    }
+                }
+            });
+        }
+
+        function dia1() {
+            $('#dialog').dialog({
+                resizable: false,
+                height: "auto",
+                width: 400,
+                modal: true,
+                show: {
+                    effect: "puff",
+                    duration: 200
+                },
+                hide: {
+                    effect: "puff",
+                    duration: 200
+                },
+                buttons: {
+                    "Go On": function () {
+                        count = 0;
+                        turn = true;
+                        $(this).dialog("close");
+                        $('button').attr('disabled', false).text("_");
+
+                    },
+                    "New Settings": function () {
+                        $('#p2Count').val(0);
+                        $('#p1Count').val(0);
+                        $('#drawCount').val(0);
+                        $(this).dialog("close");
+                        dia0();
+                    }
+                }
+            });
+        }
+
+        function checkForWinner() {
+            aWinner = false;
+            draw = false;
+            if (count == 9)
+                draw = true;
+
+            if ($('#A1').text() == $('#A2').text() && $('#A2').text() == $('#A3').text() && $('#A1').prop('disabled') == true)
+                aWinner = true;
+            else if ($('#B1').text() == $('#B2').text() && $('#B2').text() == $('#B3').text() && $('#B1').prop('disabled') == true)
+                aWinner = true;
+            else if ($('#C1').text() == $('#C2').text() && $('#C2').text() == $('#C3').text() && $('#C1').prop('disabled') == true)
+                aWinner = true;
+            else if ($('#A1').text() == $('#B1').text() && $('#B1').text() == $('#C1').text() && $('#A1').prop('disabled') == true)
+                aWinner = true;
+            else if ($('#A2').text() == $('#B2').text() && $('#B2').text() == $('#C2').text() && $('#A2').prop('disabled') == true)
+                aWinner = true;
+            else if ($('#A3').text() == $('#B3').text() && $('#B3').text() == $('#C3').text() && $('#A3').prop('disabled') == true)
+                aWinner = true;
+            else if ($('#A1').text() == $('#B2').text() && $('#B2').text() == $('#C3').text() && $('#A1').prop('disabled') == true)
+                aWinner = true;
+            else if ($('#A3').text() == $('#B2').text() && $('#B2').text() == $('#C1').text() && $('#A3').prop('disabled') == true)
+                aWinner = true;
+
+            if (aWinner) {
+                $('button').attr('disabled', true);
+
+                if (turn) {
+                    winner = $('#P2').val();
+                    $('#p2Count').val(parseInt($('#p2Count').val()) + 1);
+                }
+                else {
+                    winner = $('#P1').val();
+                    $('#p1Count').val(parseInt($('#p1Count').val()) + 1);
+                }
+                if (winner == 'Computer')
+                    $('#dia1Text').text(winner + " Win The Game!!!\nDo you want to play again with same settings?");
+                else
+                    $('#dia1Text').text("Congrats Player " + winner + " You Win The Game!!!\nDo you want to play again with same settings?");
+
+                dia1();
+            }
+            else if (draw) {
+                $('#drawCount').val(parseInt($('#drawCount').val()) + 1);
+                $('#dia1Text').text("Its a Draw!!!\nDo you want to play again with same settings?");
+                dia1();
+            }
+        }
+
+        function look_for_open_space() {
+            $("button:contains('_'):first", '#xoB').click();
+            return null;
+        }
+
+        function look_for_corner() {
+            if ($('#A1').text() == "O") {
+                if ($('#A3').text() == "_") {
+                    $('#A3').click();
+                    return 1;
+                }
+                if ($('#C3').text() == "_") {
+                    $('#C3').click();
+                    return 1;
+                }
+                if ($('#C1').text() == "_") {
+                    $('#C1').click();
+                    return 1;
+                }
+            }
+            if ($('#A3').text() == "O") {
+                if ($('#A1').text() == "_") {
+                    $('#A1').click();
+                    return 1;
+                }
+                if ($('#C3').text() == "_") {
+                    $('#C3').click();
+                    return 1;
+                }
+
+                if ($('#C1').text() == "_") {
+                    $('#C1').click();
+                    return 1;
+                }
+            }
+            if ($('#C3').text() == "O") {
+                if ($('#A1').text() == "_") {
+                    $('#A3').click();
+                    return 1;
+                }
+                if ($('#A3').text() == "_") {
+                    $('#A3').click();
+                    return 1;
+                }
+                if ($('#C1').text() == "_") {
+                    $('#C1').click();
+                    return 1;
+                }
+            }
+            if ($('#C1').text() == "O") {
+                if ($('#A1').text() == "_") {
+                    $('#A3').click();
+                    return 1;
+                }
+                if ($('#A3').text() == "_") {
+                    $('#A3').click();
+                    return 1;
+                }
+                if ($('#C3').text() == "_") {
+                    $('#C3').click();
+                    return 1;
+                }
+            }
+            if ($('#A1').text() == "_") {
+                $('#A1').click();
+                return 1;
+            }
+            if ($('#A3').text() == "_") {
+                $('#A3').click();
+                return 1;
+            }
+            if ($('#C1').text() == "_") {
+                $('#C1').click();
+                return 1;
+            }
+            if ($('#C3').text() == "_") {
+                $('#C3').click(); return 1;
+            }
+
+            return null;
+        }
+
+        function look_for_win_or_block(mark) {
+            if (($('#A1').text() == mark) && ($('#A2').text() == mark) && ($('#A3').text() == "_"))
+            { $('#A3').click(); return 1; }
+            if (($('#A2').text() == mark) && ($('#A3').text() == mark) && ($('#A1').text() == "_"))
+            { $('#A1').click(); return 1; }
+            if (($('#A1').text() == mark) && ($('#A3').text() == mark) && ($('#A2').text() == "_"))
+            { $('#A2').click(); return 1; }
+
+            if (($('#B1').text() == mark) && ($('#B2').text() == mark) && ($('#B3').text() == "_"))
+            { $('#B3').click(); return 1; }
+            if (($('#B2').text() == mark) && ($('#B3').text() == mark) && ($('#B1').text() == "_"))
+            { $('#B1').click(); return 1; }
+            if (($('#B1').text() == mark) && ($('#B3').text() == mark) && ($('#B2').text() == "_"))
+            { $('#B2').click(); return 1; }
+
+            if (($('#C1').text() == mark) && ($('#C2').text() == mark) && ($('#C3').text() == "_"))
+            { $('#C3').click(); return 1; }
+            if (($('#C2').text() == mark) && ($('#C3').text() == mark) && ($('#C1').text() == "_"))
+            { $('#C1').click(); return 1; }
+            if (($('#C1').text() == mark) && ($('#C3').text() == mark) && ($('#C2').text() == "_"))
+            { $('#C2').click(); return 1; }
+
+            //VERTICAL TESTS
+            if (($('#A1').text() == mark) && ($('#B1').text() == mark) && ($('#C1').text() == "_"))
+            { $('#C1').click(); return 1; }
+            if (($('#B1').text() == mark) && ($('#C1').text() == mark) && ($('#A1').text() == "_"))
+            { $('#A1').click(); return 1; }
+            if (($('#A1').text() == mark) && ($('#C1').text() == mark) && ($('#B1').text() == "_"))
+            { $('#B1').click(); return 1; }
+
+            if (($('#A2').text() == mark) && ($('#B2').text() == mark) && ($('#C2').text() == "_"))
+            { $('#C2').click(); return 1; }
+            if (($('#B2').text() == mark) && ($('#C2').text() == mark) && ($('#A2').text() == "_"))
+            { $('#A2').click(); return 1; }
+            if (($('#A2').text() == mark) && ($('#C2').text() == mark) && ($('#B2').text() == "_"))
+            { $('#B2').click(); return 1; }
+
+            if (($('#A3').text() == mark) && ($('#B3').text() == mark) && ($('#C3').text() == "_"))
+            { $('#C3').click(); return 1; }
+            if (($('#B3').text() == mark) && ($('#C3').text() == mark) && ($('#A3').text() == "_"))
+            { $('#A3').click(); return 1; }
+            if (($('#A3').text() == mark) && ($('#C3').text() == mark) && ($('#B3').text() == "_"))
+            { $('#B3').click(); return 1; }
+
+            //DIAGONAL TESTS
+            if (($('#A1').text() == mark) && ($('#B2').text() == mark) && ($('#C3').text() == "_"))
+            { $('#C3').click(); return 1; }
+            if (($('#B2').text() == mark) && ($('#C3').text() == mark) && ($('#A1').text() == "_"))
+            { $('#A1').click(); return 1; }
+            if (($('#A1').text() == mark) && ($('#C3').text() == mark) && ($('#B2').text() == "_"))
+            { $('#B2').click(); return 1; }
+
+            if (($('#A3').text() == mark) && ($('#B2').text() == mark) && ($('#C1').text() == "_"))
+            { $('#C1').click(); return 1; }
+            if (($('#B2').text() == mark) && ($('#C1').text() == mark) && ($('#A3').text() == "_"))
+            { $('#A3').click(); return 1; }
+            if (($('#A3').text() == mark) && ($('#C1').text() == mark) && ($('#B2').text() == "_"))
+            { $('#B2').click(); return 1; }
+
+            return null;
+        }
+
+        function computer_move() {
+            var nul;
+            if (count == 9)
+                return 1;
+            nul = look_for_win_or_block(O);
+            if (nul == null) {
+                nul = look_for_win_or_block(X);
+                if (nul == null) {
+                    nul = look_for_corner();
+                    if (nul == null) {
+                        nul = look_for_open_space();
+                    }//end if
+                }//end if
+            }//end if
+        }
+
+        $(function () {
+            dia0();
+            $('#vsComputer').click(function () {
+                $('#p2Name').val('Computer');
+                $('#p2Name').prop('disabled', true);
+                againstComputer = true;
+            });
+
+            $('#vsHuman').click(function () {
+                $('#p2Name').val('');
+                $('#p2Name').prop('disabled', false);
+                againstComputer = false;
+            });
+
+            $('.xoB').click(function () {
+                if (turn)
+                    $(this).text(X);
+                else
+                    $(this).text(O);
+                count++;
+                turn = !turn;
+                $(this).prop('disabled', true);
+                checkForWinner();
+
+                if (!turn && againstComputer) {
+                    computer_move();
+                }
+            });
+
+            $('.xoB').mouseenter(function () {
+                if (!$(this).prop('disabled')) {
+                    if (turn)
+                        $(this).text(X);
+                    else
+                        $(this).text(O);
+                }
+
+
+            });
+
+            $('.xoB').mouseleave(function () {
+                if (!$(this).prop('disabled'))
+                    $(this).text("_");
+            });
+        });
+
+    </script>
+
+    <div class="container">
+        <h1>Tic Tac Toe</h1>
+        <div class="align">
+            <div class="xoCont">
+                <button id="A1" class="xoB">_</button>
+                <button id="A2" class="xoB">_</button>
+                <button id="A3" class="xoB">_</button>
+                <button id="B1" class="xoB">_</button>
+                <button id="B2" class="xoB">_</button>
+                <button id="B3" class="xoB">_</button>
+                <button id="C1" class="xoB">_</button>
+                <button id="C2" class="xoB">_</button>
+                <button id="C3" class="xoB">_</button>
+            </div>
+        </div>
+        <div class="align">
+            <div class="xoCont spaceTop">
+                <input id="P1" type="text" />
+                <input id="draw" type="text" value="Draw Count" />
+                <input id="P2" type="text" />
+                <input id="p1Count" type="number" value="0" />
+                <input id="drawCount" type="number" value="0" />
+                <input id="p2Count" type="number" value="0" />
+            </div>
+        </div>
+    </div>
+
+
+    <div id="dialog" title="Tic Tac Toe">
+        <p id="dia1Text"></p>
+    </div>
+
+    <div id="dialog0" title="New Game Settings">
+        <p class="validateTips">All form fields are required.</p>
+        <form id="myForm">
+            <fieldset>
+                <label for="p1Name">Player1 Name</label>
+                <input type="text" name="name" id="p1Name" class="text ui-widget-content ui-corner-all">
+                <br />
+                <label for="p2Name">Player2 Name</label>
+                <input type="text" name="name" id="p2Name" class="text ui-widget-content ui-corner-all">
+                <br />
+                <label for="vsComputer">vs Computer</label>
+                <input type="radio" id="vsComputer" name="vs" value="vs Computer">
+                <label for="vsHuman"> vs Human</label>
+                <input type="radio" id="vsHuman" name="vs" value=" vs Human" checked="checked">
+                <br />
+                <label for="OOO">Player 1 - O</label>
+                <input type="radio" id="OOO" name="XO" value="O">
+                <label for="XXX">Player 1 - X</label>
+                <input type="radio" id="XXX" name="XO" value="X" checked="checked">
+            </fieldset>
+        </form>
+    </div>
+</body>
+</html>
